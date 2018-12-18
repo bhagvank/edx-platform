@@ -202,10 +202,11 @@ class GradingPage(SettingsPage):
         self.browser.execute_script(script, selector, grace_time_value)
         # script_for_scroll = "$('.action-save')[0].scrollIntoView();"
         # self.browser.execute_script(script_for_scroll)
-        #self.wait_for_ajax()
-        # self.wait_for_element_visibility('.action-save', 'Save button is present')
+        # self.wait_for_ajax()
+        #self.wait_for_element_visibility('.action-save', 'Save button is present')
         assert self.q(css='#course-grading-graceperiod').attrs('value')[0] == '01:99' or '48:00'
         self.save()
+        assert self.q(css='#course-grading-graceperiod').attrs('value')[0] == '01:99' or '48:00'
 
     @property
     def grace_period_value(self):
@@ -213,7 +214,7 @@ class GradingPage(SettingsPage):
         Get the grace period field value.
         """
         self.wait_for(
-            lambda: self.q(css=self.grace_period_field).attrs('value')[0] != '00:00',
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] != '00:00',
             description="Grace period field is updated"
         )
         return self.q(css='#course-grading-graceperiod').attrs('value')[0]
