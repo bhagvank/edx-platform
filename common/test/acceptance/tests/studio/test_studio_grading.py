@@ -240,8 +240,8 @@ class GradingPageTest(StudioCourseTest):
             And I reload the page
             Then I see the grace period is "48:00"
         """
-        self.grading_page.set_grace_period_value('48:00')
-        grace_time = self.grading_page.grace_period_value
+        grace_time = self.grading_page.set_grace_period_value('48:00')
+        # grace_time = self.grading_page.grace_period_value
         self.assertEqual(grace_time, '48:00')
 
     def test_grace_period_wrapped_to_correct_time(self):
@@ -254,8 +254,8 @@ class GradingPageTest(StudioCourseTest):
             And I reload the page
             Then I see the grace period is "02:39"
         """
-        self.grading_page.set_grace_period_value('01:99')
+        grace_time = self.grading_page.set_grace_period_value('01:99')
         # self.grading_page.save()
         # self.grading_page.refresh_and_wait_for_load()
-        grace_time = self.grading_page.grace_period_value
+        # grace_time = self.grading_page.grace_period_value
         self.assertEqual(grace_time, '02:39')

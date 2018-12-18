@@ -207,6 +207,7 @@ class GradingPage(SettingsPage):
         assert self.q(css='#course-grading-graceperiod').attrs('value')[0] == '01:99' or '48:00'
         self.save()
         assert self.q(css='#course-grading-graceperiod').attrs('value')[0] == '01:99' or '48:00'
+        return self.q(css='#course-grading-graceperiod').attrs('value')[0]
 
     @property
     def grace_period_value(self):
