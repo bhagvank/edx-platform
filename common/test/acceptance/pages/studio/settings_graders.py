@@ -205,6 +205,7 @@ class GradingPage(SettingsPage):
         )
         selector_save = 'div#page-notification button.action-save'
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
+        self.wait_for_ajax()
         self.wait_for_element_visibility('#alert-confirmation-title', 'Save changes title is visible')
 
     @property
