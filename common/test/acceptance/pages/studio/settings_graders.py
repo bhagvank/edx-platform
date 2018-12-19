@@ -204,11 +204,16 @@ class GradingPage(SettingsPage):
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
             description="Grace period field is updated before save"
         )
-        selector_save = 'div#page-notification button.action-save'
+        self.wait_for_element_presence('#page-notification', 'page notification visible')
+        self.wait_for_element_presence('#page-notification button', 'page notification buttons visible')
+        self.wait_for_element_presence('#page-notification button.action-cancel', 'page notification cancel button visible')
+        self.wait_for_element_presence('#page-notification button.action-save', 'page notification save button visible')
+        selector_save = '#page-notification button.action-save'
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
-        time.sleep(10)
-        # self.wait_for_ajax()
-        # self.wait_for_element_visibility('#alert-confirmation-title', 'Save changes title is visible')
+        self.wait_for(
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
+            description="Grace period field is updated after save 1"
+        )
 
     @property
     def grace_period_value(self):
