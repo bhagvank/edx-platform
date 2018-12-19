@@ -204,7 +204,9 @@ class GradingPage(SettingsPage):
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
             description="Grace period field is updated before save"
         )
-        self.wait_for_element_presence('#page-notification', 'page notification visible')
+        import time
+        time.sleep(10)
+        self.wait_for_element_visibility('#page-notification', 'page notification visible')
         self.wait_for_element_presence('#page-notification button', 'page notification buttons visible')
         self.wait_for_element_presence('#page-notification button.action-cancel', 'page notification cancel button visible')
         self.wait_for_element_presence('#page-notification button.action-save', 'page notification save button visible')
