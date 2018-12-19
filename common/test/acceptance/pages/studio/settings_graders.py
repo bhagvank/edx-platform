@@ -196,29 +196,16 @@ class GradingPage(SettingsPage):
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '00:00',
             "Initial value of grace period is 00:00"
         )
-        # self.q(css='#course-grading-graceperiod').fill(grace_time_value)
         selector = '#course-grading-graceperiod'
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, grace_time_value)
-        # script_for_scroll = "$('.action-save')[0].scrollIntoView();"
-        # self.browser.execute_script(script_for_scroll)
-        # self.wait_for_ajax()
-        #self.wait_for_element_visibility('.action-save', 'Save button is present')
-        # import pdb
-        # pdb.set_trace()
-        self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
-            description="Grace period field is updated before save"
-        )
         selector_save = 'div#page-notification button.action-save'
-        # self.browser.execute_script("$('{}').focus().click()".format(selector_save))
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
-        # self.save()
-        self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
-            description="Grace period field is updated after save"
-        )
-        return self.q(css='#course-grading-graceperiod').attrs('value')[0]
+        # self.wait_for(
+        #     lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
+        #     description="Grace period field is updated after save"
+        # )
+        # return self.q(css='#course-grading-graceperiod').attrs('value')[0]
 
     @property
     def grace_period_value(self):
