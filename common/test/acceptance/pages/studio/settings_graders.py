@@ -204,11 +204,16 @@ class GradingPage(SettingsPage):
         # self.browser.execute_script(script_for_scroll)
         # self.wait_for_ajax()
         #self.wait_for_element_visibility('.action-save', 'Save button is present')
+        # import pdb
+        # pdb.set_trace()
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
             description="Grace period field is updated before save"
         )
-        self.save()
+        selector_save = 'div#page-notification button.action-save'
+        # self.browser.execute_script("$('{}').focus().click()".format(selector_save))
+        self.browser.execute_script("$(arguments[0]).click();", selector_save)
+        # self.save()
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
             description="Grace period field is updated after save"
