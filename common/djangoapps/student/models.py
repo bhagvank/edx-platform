@@ -785,6 +785,31 @@ class PendingEmailChange(DeletableByUserValue, models.Model):
         return self.activation_key
 
 
+class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
+    """
+    This model keeps track of pending requested changes to a user's secondary email address.
+    """
+    user = models.OneToOneField(User, unique=True, db_index=True, on_delete=models.CASCADE)
+    new_secondary_email = models.CharField(blank=True, max_length=255, db_index=True)
+    activation_key = models.CharField(('activation key'), max_length=32, unique=True, db_index=True)
+
+    def request_change(self, email):
+        """Request a change to a user's secondary email.
+
+        Implicitly saves the pending secondary email change record.
+
+        Arguments:
+            email (unicode): The proposed new secondary email for the user.
+
+        Returns:
+            unicode: The activation code to confirm the change.
+
+        """
+        self.new_email = email
+        self.activation_key = uuid.uuid4().hex
+        self.save()
+        return self.activation_key
+
 EVENT_NAME_ENROLLMENT_ACTIVATED = 'edx.course.enrollment.activated'
 EVENT_NAME_ENROLLMENT_DEACTIVATED = 'edx.course.enrollment.deactivated'
 EVENT_NAME_ENROLLMENT_MODE_CHANGED = 'edx.course.enrollment.mode_changed'
@@ -2692,6 +2717,7 @@ class AccountRecovery(models.Model):
         null=False,
         blank=False,
     )
+    is_active = models.BooleanField(default=False)
 
     class Meta(object):
         db_table = "auth_accountrecovery"
