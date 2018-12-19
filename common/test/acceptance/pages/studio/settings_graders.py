@@ -6,8 +6,8 @@ from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
 from selenium.webdriver.common.action_chains import ActionChains
-from bok_choy.promise import BrokenPromise
 from selenium.webdriver.common.keys import Keys
+from bok_choy.promise import BrokenPromise
 
 
 class GradingPage(SettingsPage):
@@ -199,13 +199,13 @@ class GradingPage(SettingsPage):
         selector = '#course-grading-graceperiod'
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, grace_time_value)
+        self.wait_for(
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
+            description="Grace period field is updated before save"
+        )
         selector_save = 'div#page-notification button.action-save'
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
-        # self.wait_for(
-        #     lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
-        #     description="Grace period field is updated after save"
-        # )
-        # return self.q(css='#course-grading-graceperiod').attrs('value')[0]
+        self.wait_for_element_visibility('#alert-confirmation-title', 'Save changes title is visible')
 
     @property
     def grace_period_value(self):
@@ -214,7 +214,7 @@ class GradingPage(SettingsPage):
         """
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] != '00:00',
-            description="Grace period field is updated"
+            description="Grace period field is updated after save"
         )
         return self.q(css='#course-grading-graceperiod').attrs('value')[0]
 
@@ -249,13 +249,6 @@ class GradingPage(SettingsPage):
             return True
         except BrokenPromise:
             return False
-
-    def add_new_assignment_type(self):
-        """
-        Add New Assignment type
-        """
-        self.q(css='.add-grading-data').click()
-        self.save_changes()
 
     @property
     def grades_range(self):
