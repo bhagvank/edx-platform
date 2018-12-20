@@ -1,13 +1,13 @@
 """
 Course Grading Settings page.
 """
-from bok_choy.javascript import requirejs
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
+from bok_choy.javascript import requirejs
 from bok_choy.promise import BrokenPromise, EmptyPromise
 
 
@@ -148,10 +148,6 @@ class GradingPage(SettingsPage):
             assignment_name(string): Assignment name for which weight is to be changed.
             weight(string): New weight
         """
-        self.wait_for_element_visibility(
-            '#alert-confirmation-title',
-            'Save confirmation message is visible'
-        )
         weight_id = '#course-grading-assignment-gradeweight'
         index = self._get_type_index(assignment_name)
         f = self.q(css=weight_id).results[index]
@@ -234,10 +230,6 @@ class GradingPage(SettingsPage):
         #     description="Grace period field is updated before save"
         # )
 
-        self.wait_for_element_presence('#page-notification', 'page notification visible')
-        self.wait_for_element_presence('#notification-warning', 'Notification warning')
-        self.wait_for_element_presence('#notification-warning button.action-cancel', 'page notification cancel button visible')
-        self.wait_for_element_presence('#notification-warning button.action-save', 'page notification save button visible')
         selector_save = '#page-notification button.action-save'
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
         self.wait_for(
@@ -402,20 +394,21 @@ class GradingPage(SettingsPage):
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
 
-    def set_element_values(self, grace_time_value):
+    def set_element_values(self, grace_time_value_dict):
         """
         Set the values of the elements to those specified
-        in the element_values dict.
+        in the grace_time_value_dict dict.
         """
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '00:00',
             "Initial value of grace period is 00:00"
         )
-        for css, value in grace_time_value.iteritems():
+        for css, value in grace_time_value_dict.iteritems():
             element = self.get_element(css)
             element.clear()
             # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
             element.send_keys(value)
+            grace_time_value = value
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
             "Updated value of grace field"
@@ -438,6 +431,10 @@ class GradingPage(SettingsPage):
     def click_button(self, name, wait_for_confirmation=True):
         """
         Clicks the button
+
+        Arguments:
+            name (str): button name
+            wait_for_confirmation (bool) wait for save message
         """
 
         btn_css = 'div#page-notification button.action-{}'.format(name.lower())
