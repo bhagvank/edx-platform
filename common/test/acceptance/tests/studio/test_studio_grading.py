@@ -30,11 +30,10 @@ class GradingPageTest(StudioCourseTest):
         """
         Set dates for the course.
         """
-        # grace_period_dictionary = {
-        #     "#course-grading-graceperiod": "48:00"
-        # }
-        self.grading_page.set_grace_value("48:00")
-        # self.grading_page.set_element_values(grace_period_dictionary)
+        grace_period_dictionary = {
+            "#course-grading-graceperiod": "48:00"
+        }
+        self.grading_page.set_element_values(grace_period_dictionary)
 
     def ensure_input_fields_are_loaded(self):
         """

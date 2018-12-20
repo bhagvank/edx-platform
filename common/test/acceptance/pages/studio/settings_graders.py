@@ -404,28 +404,24 @@ class GradingPage(SettingsPage):
         Set the values of the elements to those specified
         in the element_values dict.
         """
+        self.wait_for(
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '00:00',
+            "Initial value of grace period is 00:00"
+        )
         for css, value in element_values.iteritems():
             element = self.get_element(css)
             element.clear()
             element.send_keys(value)
-
-    def set_grace_value(self, element_value):
-        """
-        Set the values of the elements to those specified
-        in the element_values dict.
-        """
-        grace_field = self.q(css="#course-grading-graceperiod").results[0]
-        grace_field.clear()
-        grace_field.send_keys(element_value)
         self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == element_value,
-            "Value of grace field is udpated"
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
+            "Updated value of grace field"
         )
 
     def save_changes(self, wait_for_confirmation=True):
         """
         Clicks save button, waits for confirmation unless otherwise specified
         """
+
         press_the_notification_button(self, "save")
         if wait_for_confirmation:
             self.wait_for_element_visibility(
