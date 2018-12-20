@@ -411,6 +411,7 @@ class GradingPage(SettingsPage):
         for css, value in element_values.iteritems():
             element = self.get_element(css)
             element.clear()
+            # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
             element.send_keys(value)
         self.wait_for(
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
