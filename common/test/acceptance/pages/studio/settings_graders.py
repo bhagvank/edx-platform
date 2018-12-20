@@ -207,9 +207,9 @@ class GradingPage(SettingsPage):
         import time
         time.sleep(20)
         self.wait_for_element_presence('#page-notification', 'page notification visible')
-        self.wait_for_element_presence('#page-notification button', 'page notification buttons visible')
-        self.wait_for_element_presence('#page-notification button.action-cancel', 'page notification cancel button visible')
-        self.wait_for_element_presence('#page-notification button.action-save', 'page notification save button visible')
+        self.wait_for_element_presence('#notification-warning', 'Notification warning')
+        self.wait_for_element_presence('#notification-warning button.action-cancel', 'page notification cancel button visible')
+        self.wait_for_element_presence('#notification-warning button.action-save', 'page notification save button visible')
         selector_save = '#page-notification button.action-save'
         self.browser.execute_script("$(arguments[0]).click();", selector_save)
         self.wait_for(
