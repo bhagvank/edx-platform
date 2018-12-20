@@ -420,3 +420,21 @@ class GradingPage(SettingsPage):
             )
         # After visibility an ajax call is in process, waiting for that to complete
         self.wait_for_ajax()
+
+    def click_button(self, name, wait_for_confirmation=True):
+        """
+        Clicks the button
+        """
+        btn_css = 'div#page-notification button.action-{}'.format(name.lower())
+        EmptyPromise(
+            lambda: self.q(css=btn_css).visible,
+            '{} button is visible'.format(name)
+        ).fulfill()
+        press_the_notification_button(self, name)
+        if wait_for_confirmation:
+            self.wait_for_element_visibility(
+                '#alert-confirmation-title',
+                'Save confirmation message is visible'
+            )
+        # After visibility an ajax call is in process, waiting for that to complete
+        self.wait_for_ajax()
