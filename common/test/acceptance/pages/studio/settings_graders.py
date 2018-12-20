@@ -2,7 +2,6 @@
 Course Grading Settings page.
 """
 from bok_choy.javascript import requirejs
-
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
@@ -149,6 +148,10 @@ class GradingPage(SettingsPage):
             assignment_name(string): Assignment name for which weight is to be changed.
             weight(string): New weight
         """
+        self.wait_for_element_visibility(
+            '#alert-confirmation-title',
+            'Save confirmation message is visible'
+        )
         weight_id = '#course-grading-assignment-gradeweight'
         index = self._get_type_index(assignment_name)
         f = self.q(css=weight_id).results[index]
@@ -399,7 +402,7 @@ class GradingPage(SettingsPage):
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
 
-    def set_element_values(self, element_values):
+    def set_element_values(self, grace_time_value):
         """
         Set the values of the elements to those specified
         in the element_values dict.
@@ -408,13 +411,13 @@ class GradingPage(SettingsPage):
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '00:00',
             "Initial value of grace period is 00:00"
         )
-        for css, value in element_values.iteritems():
+        for css, value in grace_time_value.iteritems():
             element = self.get_element(css)
             element.clear()
             # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
             element.send_keys(value)
         self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '48:00',
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
             "Updated value of grace field"
         )
 

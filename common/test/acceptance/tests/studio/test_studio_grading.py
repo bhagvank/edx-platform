@@ -26,12 +26,12 @@ class GradingPageTest(StudioCourseTest):
         self.grading_page.visit()
         self.ensure_input_fields_are_loaded()
 
-    def set_grace_period(self):
+    def set_grace_period(self, grace_time_value):
         """
         Set dates for the course.
         """
         grace_period_dictionary = {
-            "#course-grading-graceperiod": "48:00"
+            "#course-grading-graceperiod": grace_time_value
         }
         self.grading_page.set_element_values(grace_period_dictionary)
 
@@ -262,7 +262,7 @@ class GradingPageTest(StudioCourseTest):
             Then I see the grace period is "48:00"
         """
 
-        self.set_grace_period()
+        self.set_grace_period('48:00')
         # self.grading_page.save_changes()
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
@@ -271,19 +271,19 @@ class GradingPageTest(StudioCourseTest):
         grace_time = self.grading_page.grace_period_value
         self.assertEqual(grace_time, '48:00')
 
-    # def test_grace_period_wrapped_to_correct_time(self):
-    #     """
-    #     Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
-    #         Given I have populated a new course in Studio
-    #         And I am viewing the grading settings
-    #         When I change the grace period to "01:99"
-    #         And I press the "Save" notification button
-    #         And I reload the page
-    #         Then I see the grace period is "02:39"
-    #     """
-    #     self.grading_page.set_grace_period_value('01:99')
-    #     # self.grading_page.save()
-    #     # self.grading_page.refresh_and_wait_for_load()
-    #     grace_time = self.grading_page.grace_period_value
-    #     self.assertEqual(grace_time, '02:39')
-
+    def test_grace_period_wrapped_to_correct_time(self):
+        """
+        Scenario: Grace periods of more than 59 minutes are wrapped to the correct time
+            Given I have populated a new course in Studio
+            And I am viewing the grading settings
+            When I change the grace period to "01:99"
+            And I press the "Save" notification button
+            And I reload the page
+            Then I see the grace period is "02:39"
+        """
+        self.set_grace_period('01:99')
+        self.grading_page.click_button("save")
+        self.grading_page.refresh_and_wait_for_load()
+        self.ensure_input_fields_are_loaded()
+        grace_time = self.grading_page.grace_period_value
+        self.assertEqual(grace_time, '02:39')
