@@ -225,6 +225,7 @@ class GradingPage(SettingsPage):
         selector = '#course-grading-graceperiod'
         script = "$(arguments[0]).val(arguments[1]).change();"
         self.browser.execute_script(script, selector, grace_time_value)
+        self.wait_for_element_visibility(".message-error", "Error Message is present")
         # self.wait_for(
         #     lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
         #     description="Grace period field is updated before save"
@@ -425,6 +426,7 @@ class GradingPage(SettingsPage):
         """
         Clicks the button
         """
+
         btn_css = 'div#page-notification button.action-{}'.format(name.lower())
         EmptyPromise(
             lambda: self.q(css=btn_css).visible,
