@@ -1,7 +1,7 @@
 """
 Course Grading Settings page.
 """
-from common.test.acceptance.pages.studio.settings import SettingsPage
+from common.test.acceptance.pages.studio.course_page import CoursePage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
@@ -12,7 +12,7 @@ from bok_choy.promise import BrokenPromise, EmptyPromise
 
 
 @requirejs('js/factories/settings_graders')
-class GradingPage(SettingsPage):
+class GradingPage(CoursePage):
     """
     Course Grading Settings page.
     """
@@ -137,9 +137,19 @@ class GradingPage(SettingsPage):
             old_name (str): The assignment type name which is to be changed.
             new_name (str): New name of the assignment.
         """
-        self.wait_for_element_visibility('#course-grading-assignment-name', 'Assignment Name field visible')
+        self.wait_for(
+            lambda: self.q(css='#course-grading-assignment-name').filter(
+                lambda el: el.get_attribute('value') == ''),
+            "New Assignment field visible before"
+        )
+        # self.wait_for_element_visibility('#course-grading-assignment-name', 'Assignment Name field visible')
         self.q(css='#course-grading-assignment-name').filter(
             lambda el: el.get_attribute('value') == old_name).fill(new_name)
+        self.wait_for(
+            lambda: self.q(css='#course-grading-assignment-name').filter(
+                lambda el: el.get_attribute('value') == new_name),
+            "New Assignment field visible after"
+        )
 
     def set_weight(self, assignment_name, weight):
         """
@@ -356,7 +366,6 @@ class GradingPage(SettingsPage):
         Returns:
             int: index of the assignment type
         """
-        self.click_button("save")
         name_id = '#course-grading-assignment-name'
         all_types = self.q(css=name_id).results
         for index, element in enumerate(all_types):
@@ -395,24 +404,24 @@ class GradingPage(SettingsPage):
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
 
-    def set_element_values(self, grace_time_value):
+    def set_element_values(self, grace_period_dictionary):
         """
         Set the values of the elements to those specified
-        in the grace_time_value dict.
+        in the grace_period_dictionary dict.
         """
         css_grace_field = '#course-grading-graceperiod'
         self.wait_for(
             lambda: self.q(css=css_grace_field).attrs('value')[0] == '00:00',
             "Initial value of grace period is 00:00"
         )
-        for css, value in grace_time_value.iteritems():
+        for css, value in grace_period_dictionary.iteritems():
             element = self.get_element(css)
             element.clear()
             # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
             element.send_keys(value)
             # grace_time_value = value
         self.wait_for(
-            lambda: self.q(css=css_grace_field).attrs('value')[0] == grace_time_value[css_grace_field],
+            lambda: self.q(css=css_grace_field).attrs('value')[0] == grace_period_dictionary[css_grace_field],
             "Updated value of grace field"
         )
 

@@ -205,7 +205,6 @@ class GradingPageTest(StudioCourseTest):
         """
         self.grading_page.add_new_assignment_type()
         self.grading_page.change_assignment_name('', 'New Type')
-        # self.grading_page.click_button("save")
         self.grading_page.set_weight('New Type', '7')
         self.grading_page.save()
         assignment_weight = self.grading_page.get_assignment_weight('New Type')
