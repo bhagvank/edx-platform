@@ -805,7 +805,7 @@ class PendingSecondaryEmailChange(DeletableByUserValue, models.Model):
             unicode: The activation code to confirm the change.
 
         """
-        self.new_email = email
+        self.new_secondary_email = email
         self.activation_key = uuid.uuid4().hex
         self.save()
         return self.activation_key

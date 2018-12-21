@@ -33,6 +33,13 @@ urlpatterns = [
     url(r'^course_run/{}/refund_status$'.format(settings.COURSE_ID_PATTERN),
         views.course_run_refund_status,
         name="course_run_refund_status"),
+
+    url(
+        r'^secondary_email_confirm/(?P<key>[^/]*)$',
+        views.confirm_secondary_email_changed,
+        name='confirm_secondary_email_changed'
+    ),
+
 ]
 
 # password reset django views (see above for password reset views)
