@@ -356,6 +356,7 @@ class GradingPage(SettingsPage):
         Returns:
             int: index of the assignment type
         """
+        self.click_button("save")
         name_id = '#course-grading-assignment-name'
         all_types = self.q(css=name_id).results
         for index, element in enumerate(all_types):
@@ -394,23 +395,24 @@ class GradingPage(SettingsPage):
         results = self.get_elements(css_selector=css_selector)
         return results[0] if results else None
 
-    def set_element_values(self, grace_time_value_dict):
+    def set_element_values(self, grace_time_value):
         """
         Set the values of the elements to those specified
-        in the grace_time_value_dict dict.
+        in the grace_time_value dict.
         """
+        css_grace_field = '#course-grading-graceperiod'
         self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == '00:00',
+            lambda: self.q(css=css_grace_field).attrs('value')[0] == '00:00',
             "Initial value of grace period is 00:00"
         )
-        for css, value in grace_time_value_dict.iteritems():
+        for css, value in grace_time_value.iteritems():
             element = self.get_element(css)
             element.clear()
             # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
             element.send_keys(value)
-            grace_time_value = value
+            # grace_time_value = value
         self.wait_for(
-            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == grace_time_value,
+            lambda: self.q(css=css_grace_field).attrs('value')[0] == grace_time_value[css_grace_field],
             "Updated value of grace field"
         )
 
