@@ -977,9 +977,12 @@ def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
         # if there's any error getting a user, just let django's
         # password_reset_confirm function handle it.
 
-        # TODO: update this to use a new template (needs to be added) for account recovery
         return password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html'
         )
 
     if request.method == 'POST':
@@ -1004,21 +1007,25 @@ def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
             context = {
                 'validlink': True,
                 'form': None,
-                'title': _('Password reset unsuccessful'),
+                'title': _('Password creation unsuccessful'),
                 'err_msg': ' '.join(err.messages),
             }
             context.update(platform_name)
 
-            # TODO:  update this to use a new template (needs to be added) for account recovery
             return TemplateResponse(
-                request, 'registration/password_reset_confirm.html', context
+                request, 'account_recovery/password_create_confirm.html', context
             )
 
         # remember what the old password hash is before we call down
         old_password_hash = user.password
 
         response = password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
+            post_reset_redirect='signin_user',
         )
 
         # If password reset was unsuccessful a template response is returned (status_code 200).
@@ -1028,11 +1035,11 @@ def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
             form_valid = response.context_data['form'].is_valid() if response.context_data['form'] else False
             if not form_valid:
                 log.warning(
-                    u'Unable to reset password for user [%s] because form is not valid. '
-                    u'A possible cause is that the user had an invalid reset token',
+                    u'Unable to create password for user [%s] because form is not valid. '
+                    u'A possible cause is that the user had an invalid create token',
                     user.username,
                 )
-                response.context_data['err_msg'] = _('Error in resetting your password. Please try again.')
+                response.context_data['err_msg'] = _('Error in creating your password. Please try again.')
                 return response
 
         # get the updated user
@@ -1045,9 +1052,29 @@ def account_recovery_confirm_wrapper(request, uidb36=None, token=None):
             entry = PasswordHistory()
             entry.create(updated_user)
 
+        if response.status_code == 302:
+            messages.success(
+                request,
+                HTML(_(
+                    '{html_start}Password Creation Complete{html_end}'
+                    'Your password has been created. {bold_start}{email}{bold_end} is now your primary login email.'
+                )).format(
+                    support_url=configuration_helpers.get_value('SUPPORT_SITE_LINK', settings.SUPPORT_SITE_LINK),
+                    html_start=HTML('<p class="message-title">'),
+                    html_end=HTML('</p>'),
+                    bold_start=HTML('<b>'),
+                    bold_end=HTML('</b>'),
+                    email=updated_user.email,
+                ),
+                extra_tags='account-recovery aa-icon submission-success'
+            )
     else:
         response = password_reset_confirm(
-            request, uidb64=uidb64, token=token, extra_context=platform_name
+            request,
+            uidb64=uidb64,
+            token=token,
+            extra_context=platform_name,
+            template_name='account_recovery/password_create_confirm.html',
         )
 
         response_was_successful = response.context_data.get('validlink')
