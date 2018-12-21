@@ -13,6 +13,7 @@ class GradingPageTest(StudioCourseTest):
     """
 
     url = None
+    GRACE_FIELD_CSS = "#course-grading-graceperiod"
 
     def setUp(self):  # pylint: disable=arguments-differ
         super(GradingPageTest, self).setUp()
@@ -30,17 +31,17 @@ class GradingPageTest(StudioCourseTest):
         """
         Set dates for the course.
         """
-        grace_period_dictionary = {
-            "#course-grading-graceperiod": grace_time_value
+        grace_period_dict = {
+            self.GRACE_FIELD_CSS: grace_time_value
         }
-        self.grading_page.set_element_values(grace_period_dictionary)
+        self.grading_page.set_element_values(grace_period_dict)
 
     def ensure_input_fields_are_loaded(self):
         """
         Ensures values in input fields are loaded.
         """
         EmptyPromise(
-            lambda: self.grading_page.q(css='#course-grading-graceperiod').attrs('value')[0],
+            lambda: self.grading_page.q(css=self.GRACE_FIELD_CSS).attrs('value')[0],
             "Waiting for input fields to be loaded"
         ).fulfill()
 
@@ -260,13 +261,12 @@ class GradingPageTest(StudioCourseTest):
             And I reload the page
             Then I see the grace period is "48:00"
         """
-
+        self.grading_page.check_field_value('00:00')
         self.set_grace_period('48:00')
-        # self.grading_page.save_changes()
+        self.grading_page.check_field_value('48:00')
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
         self.ensure_input_fields_are_loaded()
-        # self.grading_page.set_grace_period_value('48:00')
         grace_time = self.grading_page.grace_period_value
         self.assertEqual(grace_time, '48:00')
 
@@ -280,7 +280,9 @@ class GradingPageTest(StudioCourseTest):
             And I reload the page
             Then I see the grace period is "02:39"
         """
+        self.grading_page.check_field_value('00:00')
         self.set_grace_period('01:99')
+        self.grading_page.check_field_value('01:99')
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
         self.ensure_input_fields_are_loaded()

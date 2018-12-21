@@ -1,52 +1,29 @@
 """
 Course Grading Settings page.
 """
-from common.test.acceptance.pages.studio.course_page import CoursePage
+from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
 from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import requirejs
-from bok_choy.promise import BrokenPromise, EmptyPromise
+from bok_choy.promise import BrokenPromise
 
 
 @requirejs('js/factories/settings_graders')
-class GradingPage(CoursePage):
+class GradingPage(SettingsPage):
     """
     Course Grading Settings page.
     """
 
     url_path = "settings/grading"
-
     grade_ranges = '.grades .grade-specific-bar'
     grace_period_field = '#course-grading-graceperiod'
     assignments = '.field-group.course-grading-assignment-list-item'
 
     def is_browser_on_page(self):
-        wait_for_ajax_or_reload(self.browser)
         return self.q(css='body.grading').present
-
-    def wait_for_require_js(self):
-        """
-        Wait for require-js to load javascript files.
-        """
-        if hasattr(self, 'wait_for_js'):
-            self.wait_for_js()  # pylint: disable=no-member
-
-    def wait_for_jquery_value(self, jquery_element, value):
-        """
-        Use jQuery to obtain the element's value.
-        This is useful for when jQuery performs functions towards the
-        end of the page load. (In other words, waiting for jquery to
-        load is not enough; we need to also query values that it has
-        injected onto the page to ensure it's done.)
-        """
-        self.wait_for(
-            lambda: self.browser.execute_script(
-                "return $('{ele}').val();".format(ele=jquery_element)) == '{val}'.format(val=value),
-            'wait for jQuery to finish loading data on page.'
-        )
 
     def letter_grade(self, selector):
         """
@@ -137,19 +114,9 @@ class GradingPage(CoursePage):
             old_name (str): The assignment type name which is to be changed.
             new_name (str): New name of the assignment.
         """
-        self.wait_for(
-            lambda: self.q(css='#course-grading-assignment-name').filter(
-                lambda el: el.get_attribute('value') == ''),
-            "New Assignment field visible before"
-        )
-        # self.wait_for_element_visibility('#course-grading-assignment-name', 'Assignment Name field visible')
+        self.wait_for_element_visibility('#course-grading-assignment-name', 'Assignment Name field visible')
         self.q(css='#course-grading-assignment-name').filter(
             lambda el: el.get_attribute('value') == old_name).fill(new_name)
-        self.wait_for(
-            lambda: self.q(css='#course-grading-assignment-name').filter(
-                lambda el: el.get_attribute('value') == new_name),
-            "New Assignment field visible after"
-        )
 
     def set_weight(self, assignment_name, weight):
         """
@@ -366,6 +333,7 @@ class GradingPage(CoursePage):
         Returns:
             int: index of the assignment type
         """
+        self.click_button("save")
         name_id = '#course-grading-assignment-name'
         all_types = self.q(css=name_id).results
         for index, element in enumerate(all_types):
@@ -385,79 +353,11 @@ class GradingPage(CoursePage):
         """
         press_the_notification_button(self, "Cancel")
 
-    def refresh_and_wait_for_load(self):
+    def check_field_value(self, field_value):
         """
-        Refresh the page and wait for all resources to load.
+        Check updated values in input field
         """
-        self.browser.refresh()
-        self.wait_for_page()
-
-    def get_elements(self, css_selector):
-        self.wait_for_element_presence(
-            css_selector,
-            'Elements matching "{}" selector are present'.format(css_selector)
-        )
-        results = self.q(css=css_selector)
-        return results
-
-    def get_element(self, css_selector):
-        results = self.get_elements(css_selector=css_selector)
-        return results[0] if results else None
-
-    def set_element_values(self, grace_period_dictionary):
-        """
-        Set the values of the elements to those specified
-        in the grace_period_dictionary dict.
-        """
-        css_grace_field = '#course-grading-graceperiod'
         self.wait_for(
-            lambda: self.q(css=css_grace_field).attrs('value')[0] == '00:00',
-            "Initial value of grace period is 00:00"
+            lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == field_value,
+            "Value of input field is correct."
         )
-        for css, value in grace_period_dictionary.iteritems():
-            element = self.get_element(css)
-            element.clear()
-            # element.send_keys(Keys.chord(Keys.CONTROL, "a"), value)
-            element.send_keys(value)
-            # grace_time_value = value
-        self.wait_for(
-            lambda: self.q(css=css_grace_field).attrs('value')[0] == grace_period_dictionary[css_grace_field],
-            "Updated value of grace field"
-        )
-
-    def save_changes(self, wait_for_confirmation=True):
-        """
-        Clicks save button, waits for confirmation unless otherwise specified
-        """
-
-        press_the_notification_button(self, "save")
-        if wait_for_confirmation:
-            self.wait_for_element_visibility(
-                '#alert-confirmation-title',
-                'Save confirmation message is visible'
-            )
-        # After visibility an ajax call is in process, waiting for that to complete
-        self.wait_for_ajax()
-
-    def click_button(self, name, wait_for_confirmation=True):
-        """
-        Clicks the button
-
-        Arguments:
-            name (str): button name
-            wait_for_confirmation (bool) wait for save message
-        """
-
-        btn_css = 'div#page-notification button.action-{}'.format(name.lower())
-        EmptyPromise(
-            lambda: self.q(css=btn_css).visible,
-            '{} button is visible'.format(name)
-        ).fulfill()
-        press_the_notification_button(self, name)
-        if wait_for_confirmation:
-            self.wait_for_element_visibility(
-                '#alert-confirmation-title',
-                'Save confirmation message is visible'
-            )
-        # After visibility an ajax call is in process, waiting for that to complete
-        self.wait_for_ajax()
