@@ -4,7 +4,6 @@ Course Grading Settings page.
 from common.test.acceptance.pages.studio.settings import SettingsPage
 from common.test.acceptance.pages.studio.utils import press_the_notification_button
 from common.test.acceptance.pages.common.utils import click_css
-from common.test.acceptance.pages.studio.users import wait_for_ajax_or_reload
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 from bok_choy.javascript import requirejs
@@ -369,3 +368,11 @@ class GradingPage(SettingsPage):
             lambda: self.q(css='#course-grading-graceperiod').attrs('value')[0] == field_value,
             "Value of input field is correct."
         )
+
+    def save_change(self):
+        self.wait_for_element_visibility(
+            '#alert-confirmation-title',
+            'Save confirmation message is visible'
+        )
+        # After visibility an ajax call is in process, waiting for that to complete
+        self.wait_for_ajax()
