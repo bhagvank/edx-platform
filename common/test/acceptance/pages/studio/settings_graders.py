@@ -126,9 +126,9 @@ class GradingPage(SettingsPage):
             weight(string): New weight
         """
         weight_id = '#course-grading-assignment-gradeweight'
-        index = self._get_type_index(assignment_name)
-        f = self.q(css=weight_id).results[index]
-        assert index != -1
+        # index = self._get_type_index(assignment_name)
+        f = self.q(css=weight_id).results[-1]
+        # assert index != -1
         for __ in xrange(len(assignment_name)):
             f.send_keys(Keys.END, Keys.BACK_SPACE)
         f.send_keys(weight)
@@ -333,7 +333,6 @@ class GradingPage(SettingsPage):
         Returns:
             int: index of the assignment type
         """
-        self.click_button("save")
         name_id = '#course-grading-assignment-name'
         all_types = self.q(css=name_id).results
         for index, element in enumerate(all_types):
@@ -352,6 +351,15 @@ class GradingPage(SettingsPage):
         Click on cancel settings button.
         """
         press_the_notification_button(self, "Cancel")
+
+    def set_grace_period(self, grace_time_value):
+        """
+        Set dates for the course.
+        """
+        grace_period_dict = {
+            '#course-grading-graceperiod': grace_time_value
+        }
+        self.set_element_values(grace_period_dict)
 
     def check_field_value(self, field_value):
         """

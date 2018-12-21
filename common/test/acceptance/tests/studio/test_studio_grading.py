@@ -27,15 +27,6 @@ class GradingPageTest(StudioCourseTest):
         self.grading_page.visit()
         self.ensure_input_fields_are_loaded()
 
-    def set_grace_period(self, grace_time_value):
-        """
-        Set dates for the course.
-        """
-        grace_period_dict = {
-            self.GRACE_FIELD_CSS: grace_time_value
-        }
-        self.grading_page.set_element_values(grace_period_dict)
-
     def ensure_input_fields_are_loaded(self):
         """
         Ensures values in input fields are loaded.
@@ -262,7 +253,7 @@ class GradingPageTest(StudioCourseTest):
             Then I see the grace period is "48:00"
         """
         self.grading_page.check_field_value('00:00')
-        self.set_grace_period('48:00')
+        self.grading_page.set_grace_period('48:00')
         self.grading_page.check_field_value('48:00')
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
@@ -281,7 +272,7 @@ class GradingPageTest(StudioCourseTest):
             Then I see the grace period is "02:39"
         """
         self.grading_page.check_field_value('00:00')
-        self.set_grace_period('01:99')
+        self.grading_page.set_grace_period('01:99')
         self.grading_page.check_field_value('01:99')
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
