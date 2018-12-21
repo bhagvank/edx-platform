@@ -273,6 +273,7 @@ class GradingPageTest(StudioCourseTest):
         """
         self.grading_page.check_field_value('00:00')
         self.grading_page.set_grace_period('01:99')
+        self.ensure_input_fields_are_loaded()
         self.grading_page.check_field_value('01:99')
         self.grading_page.click_button("save")
         self.grading_page.refresh_and_wait_for_load()
